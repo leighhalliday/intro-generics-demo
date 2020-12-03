@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 
-// https://ts.chibicode.com/generics
 // 1) Generics... type parameters
 // 2) "extends" to restrict
 // 3) Default generic types
 // 4) typeof to infer type from variable
 
-function useLocalState(key, initial) {
-  const [value, setValue] = useState(() => {
+function useLocalState<S>(key: string, initial: S) {
+  const [value, setValue] = useState<S>(() => {
     if (typeof window !== "undefined" && window.localStorage) {
       const saved = window.localStorage.getItem(key);
       if (saved) {
@@ -23,13 +22,17 @@ function useLocalState(key, initial) {
     }
   }, [value]);
 
-  return [value, setValue];
+  return [value, setValue] as [typeof value, typeof setValue];
 }
 
 export default function Home() {
-  const [text, setText] = useLocalState("input", "");
+  const [text, setText] = useLocalState<string | null>("input", null);
 
   return (
-    <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
+    <input
+      type="text"
+      value={text ?? ""}
+      onChange={(e) => setText(e.target.value)}
+    />
   );
 }
